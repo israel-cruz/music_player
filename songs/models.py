@@ -10,10 +10,10 @@ class Album(models.Model):
 
 class Song(models.Model):
     title = models.CharField(max_length=256)
-    artist = models.CharField(max_length=256)
+    artist = models.CharField(max_length=256, null=True, blank=True)
     album = models.ForeignKey(Album, on_delete=models.SET_NULL, null=True, blank=True)
     time_length = models.DecimalField(max_digits=10, decimal_places=2, blank=True)
-    audio_file = models.FileField(upload_to='songs', validators=[validate_is_audio])
+    audio_file = models.FileField(upload_to='songs', validators=[validate_is_audio], null=True, blank=True)
     
     def save(self, *args, **kwargs):
         if not self.time_length:
