@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views.generic import ListView
+from django.http.response import JsonResponse
 
 import pafy
 import os
@@ -7,10 +8,12 @@ import os
 from .models import Song, Album
 from .forms import UploadSongForm, DownloadYoutubeForm
 
+def json_songs(request):
+    return JsonResponse(list(Song.objects.all().values()), safe=False)
+
 class SongListView(ListView):
     model = Song
     template_name = 'songs/home.html'
-    ordering = ['title']
     context_object_name = 'songs'
 
 def download_youtube_form(request):

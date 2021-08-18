@@ -2,14 +2,127 @@
 
 {% block content %}
 
-<div class="row">
-    <div class="col-4">
-      <div class="list-group" id="list-tab" role="tablist">
-        {% for song in songs %}
-        <a class="list-group-item list-group-item-action" id="list-profile-list" data-toggle="list" href="#list-profile" role="tab" aria-controls="profile">{{song}}</a>
-        {% endfor %}
-    </div>
-    </div>
-</div>
+<article class="screen">
+  <input type="checkbox" value="None" id="magicButton" name="check" />
+  <label class="main" for="magicButton"></label>
 
+  <div class="coverImage"></div>
+  <div class="search"></div>
+  <div class="bodyPlayer"></div>
+
+  <table class="list" id="list">
+  </table>
+				
+				<div class="shadow"></div>
+				
+				<div class="bar"></div>
+				
+				<div class="info">
+          			<h4>{{songs.0.title}}</h4>
+					<h3>{{songs.0.artist}}</h3>
+				</div>
+
+        <audio preload="none" id="audio" controls>
+			<source src="{{songs.0.audio_file.url}}"/>
+        </audio>
+
+				<table class="player">
+					<td><input type="checkbox" id="backward"/><label class="backward" for="backward"></label></td>
+					<td><input type="checkbox" id="play" title="Play" onclick="togglePlayPause()"/><label class="play" for="play"></label></td>
+					<td><input type="checkbox" id="forward"/><label class="forward" for="forward"></label></td>
+				</table>
+				
+				<table class="footer">
+					<td><input type="checkbox" id="love" onclick="shuffleList()"/><label class="love" for="love"></label></td>
+					<td><input type="checkbox" id="shuffle"/><label class="shuffle" for="shuffle"></label></td>
+					<td><input type="checkbox" id="repeat" checked /><label class="repeat" for="repeat"></label></td>
+					<td><input type="checkbox" id="options"/><label class="options" for="options"></label></td>
+				</table>
+				
+				<div class="current"><h2>{{songs.0.title}}</h2></div>
+				
+			
+		</article>
+
+<script>
+	$(document).ready(function(){
+		getSongs();
+	});
+	
+	var audio = document.getElementById('audio');
+	var playpause = document.getElementById("play").checked = false;
+	var music;
+
+	function getSongs() {
+		$.getJSON('json_songs/', function(data) {
+			music = data;
+			genList();
+			selectSong();
+		});
+	}
+
+	function genList() {
+		$.each(music, function(i,song){
+			$('#list').append('<tr class="song" id="'+i+'" onclick="check()"> <td class="nr"> <h5>'+(i+1)+'</h5></td> <td class="title"><h6>'+song.title+'</h6></td> <td class="length"><h5>'+song.time_length+'</h5></td></tr>')
+		});
+	}
+
+	function selectSong() {
+		$('tr.song').click(function(){
+			var selectedSong = $(this).attr('id');
+			playSong(selectedSong);
+		});
+	}
+
+	function playSong(id) {
+		var long = music;
+		if(id >= long.length) {
+			if(document.getElementById('repeat').checked == true) {
+				playSong(0);
+			} else {
+				audio.pause();
+				document.getElementById('play').checked = false;
+			}
+		} else {
+			var path = 'media/' + music[id].audio_file;
+			$('#audio').attr('src', path);
+			togglePlayPause();
+			playNextSong(id);
+		}
+	}
+
+	function togglePlayPause() {
+		if (audio.paused || audio.ended ) {
+			playpause.title = "Play";
+			audio.play()
+		} else {
+			playpause.title = "Pause"
+			audio.pause()
+		}
+	}
+
+	function playNextSong(id) {
+		audio.onended = function(){
+			if(document.getElementById('shuffle').checked == true) {
+				var randomId = getRandomId(music.length, id);
+				playSong(randomId);
+			} else {
+				playSong(parseInt(id)+1);
+			}
+		}
+	}
+
+	function getRandomId(length, lastId) {
+		var random = 0;
+		do {
+			random = Math.floor(Math.random() * length);
+		} while(random == lastId);
+		return random;
+	}
+
+	function check() {
+		document.getElementById("play").checked = true;
+	}
+
+</script>
 {% endblock %}
