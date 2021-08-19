@@ -7,7 +7,7 @@ class UploadSongForm(forms.ModelForm):
 
     class Meta:
         model = Song
-        fields = ['title','artist','audio_file',]
+        fields = ['title','artist','audio_file','image']
         labels = {
             'artist':'Artist (Optional)',
             'audio_file':'Song file',

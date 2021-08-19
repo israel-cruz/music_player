@@ -6,7 +6,9 @@
   <input type="checkbox" value="None" id="magicButton" name="check" />
   <label class="main" for="magicButton"></label>
 
-  <div class="coverImage"></div>
+  <div class="coverImage">
+	  <img class="coverImage" src="{{songs.0.image_url}}">
+  </div>
   <div class="search"></div>
   <div class="bodyPlayer"></div>
 
@@ -18,8 +20,8 @@
 				<div class="bar"></div>
 				
 				<div class="info">
-          			<h4>{{songs.0.title}}</h4>
-					<h3>{{songs.0.artist}}</h3>
+          			<h4 id="title">{{songs.0.title}}</h4>
+					<h3 id="artist">{{songs.0.artist}}</h3>
 				</div>
 
         <audio preload="none" id="audio" controls>
@@ -33,13 +35,13 @@
 				</table>
 				
 				<table class="footer">
-					<td><input type="checkbox" id="love" onclick="shuffleList()"/><label class="love" for="love"></label></td>
+					<td><input type="checkbox" id="love"/><label class="love" for="love"></label></td>
 					<td><input type="checkbox" id="shuffle"/><label class="shuffle" for="shuffle"></label></td>
 					<td><input type="checkbox" id="repeat" checked /><label class="repeat" for="repeat"></label></td>
 					<td><input type="checkbox" id="options"/><label class="options" for="options"></label></td>
 				</table>
 				
-				<div class="current"><h2>{{songs.0.title}}</h2></div>
+				<div class="current"><h2 id="current_title">{{songs.0.title}}</h2></div>
 				
 			
 		</article>
@@ -63,8 +65,20 @@
 
 	function genList() {
 		$.each(music, function(i,song){
-			$('#list').append('<tr class="song" id="'+i+'" onclick="check()"> <td class="nr"> <h5>'+(i+1)+'</h5></td> <td class="title"><h6>'+song.title+'</h6></td> <td class="length"><h5>'+song.time_length+'</h5></td></tr>')
+			$('#list').append('<tr class="song" id="'+i+'" onclick="check()"> <td class="nr"> <h5>'+(i+1)+'</h5></td> <td class="title"><h6>'+song.title+'</h6></td> <td class="length"><h5>'+secondsToMinutes(song.time_length)+'</h5></td></tr>')
 		});
+	}
+
+	function secondsToMinutes(seconds) {
+		d = Number(seconds);
+		var h = Math.floor(d / 3600);
+		var m = Math.floor(d % 3600 / 60);
+		var s = Math.floor(d % 3600 % 60);
+
+		var hDisplay = h > 0 ? h + ":" : "";
+		var mDisplay = m > 0 ? m + ":" : "0:";
+		var sDisplay = s > 0 ? (s < 10 ? "0" : "") + s : "00";
+		return hDisplay + mDisplay + sDisplay; 
 	}
 
 	function selectSong() {
@@ -74,16 +88,27 @@
 		});
 	}
 
+	function updateTitle(id) {
+		$('#title').text(music[id].title);
+		$('#artist').text(music[id].artist);
+		$('#current_title').text(music[id].title);
+		img_path = music[id].image_url;
+		$('div.coverImage').empty();
+		$('div.coverImage').append('<img class="coverImage" src="'+ img_path +'">')
+	}
+
 	function playSong(id) {
 		var long = music;
 		if(id >= long.length) {
 			if(document.getElementById('repeat').checked == true) {
 				playSong(0);
+				updateTitle(0);
 			} else {
 				audio.pause();
 				document.getElementById('play').checked = false;
 			}
 		} else {
+			updateTitle(id);
 			var path = 'media/' + music[id].audio_file;
 			$('#audio').attr('src', path);
 			togglePlayPause();

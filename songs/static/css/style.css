@@ -154,7 +154,6 @@ label.main:hover:before {
 }
 
 .coverImage {
-  background-size: cover;
   width: 366px;
   height: 366px;
   padding: 0;
@@ -164,6 +163,7 @@ label.main:hover:before {
   left: 0;
   transform-origin: 0% 0%;
   transition: all 0.3s ease-in;
+  background-size:cover;
 }
 
 .screen > #magicButton:checked ~ .coverImage {
@@ -209,6 +209,7 @@ label.main:hover:before {
   left: 0;
   top: 180px;
   transition: all 0.3s ease-in;
+  overflow-y: scroll;
 }
 
 .list {
@@ -237,10 +238,14 @@ label.main:hover:before {
   cursor: pointer;
 }
 
+table {
+  border-collapse: separate;
+}
+
 .title {
-  width: 215px;
+  width: 220px;
   text-align: left;
-  text-indent: 15px;
+  text-indent: 1px;
   transition: all 0.11s ease-in;
 }
 
@@ -571,9 +576,11 @@ td > #repeat:checked ~ label.repeat:before {
 
 .current {
   position: absolute;
-  right: 23px;
+  right: 5px;
   bottom: -60px;
   transition: all 0.3s ease-in;
+  width: 230px;
+  text-align: right;
 }
 
 .screen > #magicButton:checked ~ .current {

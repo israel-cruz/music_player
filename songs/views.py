@@ -28,7 +28,7 @@ def download_youtube_form(request):
             path = str(os.getcwd()) + '/media/songs/'
             best.download(filepath=path)
             file = str('songs/' + audio.title + '.m4a')
-            song = Song.objects.get_or_create(title=audio.title, artist=audio.author, time_length=audio.length, audio_file=file)
+            song = Song.objects.get_or_create(title=audio.title, artist=audio.author, time_length=audio.length, audio_file=file, image_url=audio.bigthumb)
         return redirect('songs:home')
     
     context = {
@@ -63,4 +63,6 @@ def upload_song_form(request, id=0):
                 instance.save()
             else:
                 instance.save()
+            instance.image_url = 'media/' + instance.image.name
+            instance.save()
         return redirect('songs:home')

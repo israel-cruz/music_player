@@ -9,7 +9,7 @@ SECRET_KEY = 'django-insecure-jfdq=dslbb4ut)5jdx+bqur03tb8vj#$ul_k6uhuwq*vf(!)=v
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.1.75','localhost']
 
 
 # Application definition
@@ -112,6 +112,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
