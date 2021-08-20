@@ -1,11 +1,19 @@
 {% extends 'songs/base.html' %}
-
+{% load crispy_forms_tags %}
 {% block content %}
 
-<form action="" method="POST">
-{% csrf_token %}
-{{form}}
-<button type="submit">Submit</button>  
-</form>
+<div class="container">
+    <div class="col-md-10 offset-md-1 mt-5">
+        <div class="jumbotron">
+            <h1 class="display-4">Add music from YouTube</h1>
+            <form action="" method="POST">
+                {% csrf_token %}
+                {{form.url | as_crispy_field}}
+                <button class="btn btn-success" type="submit">Add</button>
+                <a class="btn btn-danger"  href="{% url 'songs:home' %}">Cancel</a>  
+            </form>
+        </div>
+    </div>
+</div>
 
 {% endblock %}

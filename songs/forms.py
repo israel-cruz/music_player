@@ -13,5 +13,15 @@ class UploadSongForm(forms.ModelForm):
             'audio_file':'Song file',
         }
 
+class UpdateSongForm(forms.ModelForm):
+    album = forms.CharField(max_length=256, required=False, label='Album (Optional)')
+
+    class Meta:
+        model = Song
+        fields = ['title','artist','image']
+        labels = {
+            'artist':'Artist (Optional)',
+        }
+
 class DownloadYoutubeForm(forms.Form):
     url = forms.CharField(max_length=256, required=False, label='Paste your youtube link here')

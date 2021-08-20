@@ -1,0 +1,31 @@
+{% extends 'songs/home.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="container">
+  <div class="col-md-10 offset-md-1 mt-5">
+    <div class="jumbotron">
+      <h1 class="display-4">Song form</h1>
+      <hr class="my-4">
+      <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        {{form.title | as_crispy_field}}
+        {{form.artist | as_crispy_field}}
+        {{form.album | as_crispy_field}}
+        {% if request.path == '/upload/' %}
+        {{form.audio_file | as_crispy_field}}
+        {% endif %}
+        {{form.image | as_crispy_field}}
+
+        <button class="btn btn-success p-3 text-white text-center">
+          Submit
+        </button>
+        <a href="{% url 'songs:home' %}" class="btn btn-danger p-3 text-white text-center">
+          Cancel</a>
+      </form> 
+    </div>
+  </div>
+</div>
+  {% endblock %}

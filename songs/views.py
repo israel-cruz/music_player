@@ -6,7 +6,7 @@ import pafy
 import os
 
 from .models import Song, Album
-from .forms import UploadSongForm, DownloadYoutubeForm
+from .forms import UploadSongForm, DownloadYoutubeForm, UpdateSongForm
 
 def json_songs(request):
     return JsonResponse(list(Song.objects.all().values()), safe=False)
@@ -14,6 +14,11 @@ def json_songs(request):
 class SongListView(ListView):
     model = Song
     template_name = 'songs/home.html'
+    context_object_name = 'songs'
+
+class ManageListView(ListView):
+    model = Song
+    template_name = 'songs/manage.html'
     context_object_name = 'songs'
 
 def download_youtube_form(request):
@@ -43,16 +48,18 @@ def upload_song_form(request, id=0):
             form = UploadSongForm()
         else:
             song = Song.objects.get(pk=id)
-            form = UploadSongForm(instance=song)
+            form = UpdateSongForm(instance=song)
         context = {'form':form}
-        return render(request, 'songs/upload_song.html', context)
+        return render(request, 'songs/form_song.html', context)
 
     if request.method == 'POST':
         if id == 0:
             form = UploadSongForm(request.POST, request.FILES)
         else:
             song = Song.objects.get(pk=id)
-            form = UploadSongForm(request.POST, instance=song)
+            if request.FILES.get('image'):
+                song.image = request.FILES.get('image')
+            form = UpdateSongForm(request.POST, instance=song)
 
         if form.is_valid():
             instance = form.save(commit=False)
@@ -66,3 +73,8 @@ def upload_song_form(request, id=0):
             instance.image_url = 'media/' + instance.image.name
             instance.save()
         return redirect('songs:home')
+
+def delete_song_view(request, id):
+    song = Song.objects.get(pk=id)
+    song.delete()
+    return redirect('songs:manage')

@@ -11,10 +11,7 @@
   </div>
   <div class="search"></div>
   <div class="bodyPlayer"></div>
-
-  <table class="list" id="list">
-  </table>
-				
+			<div class="list"><table class="list-table" id="list"></table></div>
 				<div class="shadow"></div>
 				
 				<div class="bar"></div>
@@ -29,17 +26,27 @@
         </audio>
 
 				<table class="player">
-					<td><input type="checkbox" id="backward"/><label class="backward" for="backward"></label></td>
+					<td><input type="checkbox" id="backward" onclick="backward()"/><label class="backward" for="backward"></label></td>
 					<td><input type="checkbox" id="play" title="Play" onclick="togglePlayPause()"/><label class="play" for="play"></label></td>
-					<td><input type="checkbox" id="forward"/><label class="forward" for="forward"></label></td>
+					<td><input type="checkbox" id="forward" onclick="forward()" /><label class="forward" for="forward"></label></td>
 				</table>
 				
 				<table class="footer">
 					<td><input type="checkbox" id="love"/><label class="love" for="love"></label></td>
 					<td><input type="checkbox" id="shuffle"/><label class="shuffle" for="shuffle"></label></td>
 					<td><input type="checkbox" id="repeat" checked /><label class="repeat" for="repeat"></label></td>
-					<td><input type="checkbox" id="options"/><label class="options" for="options"></label></td>
+					<td>
+						<div class="dropleft">
+							<button data-toggle="dropdown" href="" type="button" id="options" style="background-color:#111; border:none;"><label style="color:#6d6d6d;" class="options" for="options"></label></button>
+							<div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="margin-top:-100px; text-align:left;">
+								<a href="{% url 'songs:upload' %}" class="dropdown-item" ><i class="fas fa-cloud-upload-alt"></i> Upload song</a>
+								<a href="{% url  'songs:download' %}" class="dropdown-item" ><i class="fab fa-youtube"></i> Get song from YouTube</a>
+								<a href="{% url  'songs:manage' %}" class="dropdown-item" ><i class="fas fa-tasks"></i> Manage songs list</a>
+							</ul>
+						</div>
+					</td>
 				</table>
+
 				
 				<div class="current"><h2 id="current_title">{{songs.0.title}}</h2></div>
 				
@@ -54,11 +61,14 @@
 	var audio = document.getElementById('audio');
 	var playpause = document.getElementById("play").checked = false;
 	var music;
+	var currentSongId = 0;
+	var lastSongId = 0;
 
 	function getSongs() {
 		$.getJSON('json_songs/', function(data) {
 			music = data;
 			genList();
+			$('#0').css("background-color","#ff655c");
 			selectSong();
 		});
 	}
@@ -83,36 +93,40 @@
 
 	function selectSong() {
 		$('tr.song').click(function(){
-			var selectedSong = $(this).attr('id');
-			playSong(selectedSong);
+			currentSongId = $(this).attr('id');
+			playSong();
 		});
 	}
 
-	function updateTitle(id) {
-		$('#title').text(music[id].title);
-		$('#artist').text(music[id].artist);
-		$('#current_title').text(music[id].title);
-		img_path = music[id].image_url;
+	function updateTitle() {
+		$('#title').text(music[currentSongId].title);
+		$('#'+lastSongId).css("background-color","#222")
+		$('#'+currentSongId).css("background-color","#ff655c");
+		$('#artist').text(music[currentSongId].artist);
+		$('#current_title').text(music[currentSongId].title);
+		img_path = music[currentSongId].image_url;
 		$('div.coverImage').empty();
 		$('div.coverImage').append('<img class="coverImage" src="'+ img_path +'">')
+		lastSongId = currentSongId;
 	}
 
-	function playSong(id) {
+	function playSong() {
 		var long = music;
-		if(id >= long.length) {
+		if(currentSongId >= long.length) {
 			if(document.getElementById('repeat').checked == true) {
-				playSong(0);
-				updateTitle(0);
+				currentSongId = 0;
+				playSong();
+				updateTitle();
 			} else {
 				audio.pause();
 				document.getElementById('play').checked = false;
 			}
 		} else {
-			updateTitle(id);
-			var path = 'media/' + music[id].audio_file;
+			updateTitle();
+			var path = 'media/' + music[currentSongId].audio_file;
 			$('#audio').attr('src', path);
 			togglePlayPause();
-			playNextSong(id);
+			playNextSong();
 		}
 	}
 
@@ -126,15 +140,35 @@
 		}
 	}
 
-	function playNextSong(id) {
+	function playNextSong() {
 		audio.onended = function(){
 			if(document.getElementById('shuffle').checked == true) {
-				var randomId = getRandomId(music.length, id);
-				playSong(randomId);
+				currentSongId = getRandomId(music.length, currentSongId);
 			} else {
-				playSong(parseInt(id)+1);
+				currentSongId = currentSongId + 1;
 			}
+			playSong();
 		}
+	}
+
+	function forward() {
+		if(document.getElementById('shuffle').checked == true) {
+				currentSongId = getRandomId(music.length, currentSongId);
+		} else {
+			currentSongId = currentSongId + 1;
+		}
+		document.getElementById('play').checked = true;
+		playSong();
+	}
+
+	function backward() {
+		if(currentSongId == 0) {
+			currentSongId = music.length - 1;
+		} else {
+			currentSongId = currentSongId - 1;
+		}
+		document.getElementById('play').checked = true;
+		playSong();
 	}
 
 	function getRandomId(length, lastId) {
